@@ -15,7 +15,6 @@ os.makedirs(settings.UPLOAD_DIR, exist_ok=True)
 # Initialize models
 (
     detect_noise_model,
-    gemini_model,
     wav2vec2_processor,
     wav2vec2_model,
     text_to_mel_model,
@@ -41,28 +40,33 @@ async def process_file_upload(file: UploadFile = File(...)) -> Response:
     """
     try:
         # Step 1: Save uploaded file temporarily
-        local_input_path = os.path.join(settings.UPLOAD_DIR, file.filename)
+        print("🔄 Saving uploaded file temporarily...")
+        local_input_path = os.path.join(settings.UPLOAD_DIR, file.filename.replace(" ", "_").replace("/", "_"))
         with open(local_input_path, 'wb') as f:
             content = await file.read()
             f.write(content)
+        print("✅ Uploaded file saved temporarily in", local_input_path)
+
 
         # Step 2: Process file
+        print("🔄 Starting file processing...")
         processed_content = process_file(
             local_input_path,
             detect_noise_model,
-            gemini_model,
             wav2vec2_processor,
             wav2vec2_model,
             text_to_mel_model,
             hifigan_model,
             device
         )
-
+        print("✅ File processing completed")
+        
         # Step 3: Get content type
         content_type = get_mime_type(file.filename)
 
         # Step 4: Clean up input file
         os.remove(local_input_path)
+        print("✅ Input file cleaned up")
 
         # Step 5: Return the processed file content
         return Response(

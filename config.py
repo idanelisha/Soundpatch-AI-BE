@@ -1,6 +1,7 @@
 from pydantic_settings import BaseSettings
 from typing import List
 from dotenv import load_dotenv
+import torch
 
 load_dotenv()
 
@@ -17,9 +18,11 @@ class Settings(BaseSettings):
     UPLOAD_DIR: str = "temp_files"
     ASSEMBLYAI_API_KEY: str
     GEMINI_API_KEY: str
+    DEVICE: str = "cuda" if torch.cuda.is_available() else "cpu"
+
     # Model weights paths
-    DETECT_NOISE_MODEL_WEIGHTS: str = "detect_noise_weights.h5"
-    TEXT_TO_MEL_MODEL_WEIGHTS: str = "text_to_mel_weights.h5"
+    DETECT_NOISE_MODEL_WEIGHTS: str = "/home/deep/Soundpatch-AI-BE/final_model.h5"
+    TEXT_TO_MEL_MODEL_WEIGHTS: str = "/home/deep/kesem_version/Soundpatch-AI-BE/model_weights_22_08_25-1.pth"
     
     class Config:
         case_sensitive = True
